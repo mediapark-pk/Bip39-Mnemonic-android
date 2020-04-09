@@ -17,7 +17,7 @@ public class WordListUtils {
             inputStreamReader.close();
             return new String(buffer);
         } catch (IOException e) {
-            throw new WordListException("BIP39 wordlist for  not found or is not readable"+language);
+            throw new WordListException("BIP39 wordlist for  not found or is not readable" + language);
         }
     }
 }
