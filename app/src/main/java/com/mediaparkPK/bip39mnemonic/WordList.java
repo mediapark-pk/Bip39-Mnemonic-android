@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.mediaparkPK.bip39mnemonic.utils.WordListUtils.getFileContent;
+
 public class WordList {
 
     private static Map<String, WordList> instances;
@@ -22,7 +24,7 @@ public class WordList {
         this.words = new ArrayList<>(12);
         this.count = 0;
         this.context = context;
-        String wordlist = getFileContent();
+        String wordlist = getFileContent(this.language,context);
         if (wordlist != null) {
             wordsliststr = wordlist.split("\n");
             for (String word : wordsliststr) {
@@ -79,17 +81,6 @@ public class WordList {
         return -1;
     }
 
-    private String getFileContent() {
-        try {
-            InputStream inputStreamReader = context.getAssets().open(language + ".txt");
-            int size = inputStreamReader.available();
-            byte[] buffer = new byte[size];
-            inputStreamReader.read(buffer);
-            inputStreamReader.close();
-            return new String(buffer);
-        } catch (IOException e) {
-        }
-        return null;
-    }
+
 
 }
