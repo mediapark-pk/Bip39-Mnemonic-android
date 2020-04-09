@@ -5,39 +5,26 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+
 public class Bip39Utils {
 
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
-    public static int ord(String s) throws UnsupportedEncodingException {
-        return s.length() > 0 ? (s.getBytes("UTF-8")[0] & 0xff) : 0;
-    }
-
-        public static String hash2bin(String paramString) throws UnsupportedEncodingException {
-        if (paramString.length() < 1)
-            return null;
-        byte[] arrayOfByte = new byte[paramString.length() / 2];
-        for (int i = 0; i < paramString.length() / 2; i++) {
-            int j = Integer.parseInt(paramString.substring(i * 2, i * 2 + 1), 16);
-            int k = Integer.parseInt(paramString.substring(i * 2 + 1, i * 2 + 2), 16);
-
-            arrayOfByte[i] = ((byte) (j * 16 + k));
+    public static byte[] hex2bin(String hex) throws NumberFormatException {
+        if (hex.length() % 2 > 0) {
+            throw new NumberFormatException("Hexadecimal input string must have an even length.");
         }
-        return new String(arrayOfByte);
+        byte[] r = new byte[hex.length() / 2];
+        for (int i = hex.length(); i > 0; ) {
+            r[i / 2 - 1] = (byte) (digit(hex.charAt(--i)) | (digit(hex.charAt(--i)) << 4));
+        }
+        return r;
     }
-//    public static String hash2bin(String hex) {
-//        StringBuilder output = new StringBuilder();
-//        for (int i = 0; i < hex.length(); i+=2) {
-//            String str = hex.substring(i, i+2);
-//            output.append((char)Integer.parseInt(str, 16));
-//        }
-//        return output.toString();
-//    }
 
-    public static String hash(String algo, String hash2bin, boolean shouldBin) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public static String hash(String algo, byte[] hash2bin, boolean shouldBin) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
         MessageDigest md = MessageDigest.getInstance(algo);
-        md.update(hash2bin.getBytes());
+        md.update(hash2bin);
 
         byte byteData[] = md.digest();
         int x = byteData[0];
@@ -46,25 +33,6 @@ public class Bip39Utils {
             sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
         }
         return sb.toString();
-    }
-
-    private static String hexaToBinary(String hex) {
-        String bin = "";
-        String binFragment = "";
-        int iHex;
-        hex = hex.trim();
-        hex = hex.replaceFirst("0x", "");
-
-        for (int i = 0; i < hex.length(); i++) {
-            iHex = Integer.parseInt("" + hex.charAt(i), 16);
-            binFragment = Integer.toBinaryString(iHex);
-
-            while (binFragment.length() < 4) {
-                binFragment = "0" + binFragment;
-            }
-            bin += binFragment;
-        }
-        return bin;
     }
 
     public static final String bytesToHex(byte[] bytes) {
@@ -77,12 +45,6 @@ public class Bip39Utils {
         return new String(hexChars);
     }
 
-
-    /**************************
-     *
-     * STR_PAD IMPLEMENTED
-     *
-     **************************/
     public static String str_pad(String input, int length, String pad, String sense) {
         int resto_pad = length - input.length();
         String padded = "";
@@ -108,7 +70,6 @@ public class Bip39Utils {
         }
         return padded;
     }
-
 
     private static String _fill_string(String pad, int resto) {
         boolean first = true;
@@ -137,12 +98,6 @@ public class Bip39Utils {
         return padded;
     }
 
-    /**
-     * @param inputValue
-     * @param fromBase
-     * @param toBase
-     * @return
-     */
     public static String base_convert(final String inputValue, final int fromBase, final int toBase) {
         if (fromBase < 2 || fromBase > 36 || toBase < 2 || toBase > 36) {
             return null;
@@ -156,11 +111,6 @@ public class Bip39Utils {
         return ret;
     }
 
-    /**
-     * @param str
-     * @param maxValue
-     * @return
-     */
     public static ArrayList<String> str_split(String str, int maxValue) {
         ArrayList<String> strings = new ArrayList<String>();
         int index = 0;
@@ -172,74 +122,12 @@ public class Bip39Utils {
 
     }
 
-
-    public static int hexValue(char hex_digit) throws Exception {
-        switch (hex_digit) {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                return (int) hex_digit - '0';
-
-            case 'A':
-            case 'B':
-            case 'C':
-            case 'D':
-            case 'E':
-            case 'F':
-                return (int) hex_digit - 'A' + 10;
-
-            case 'a':
-            case 'b':
-            case 'c':
-            case 'd':
-            case 'e':
-            case 'f':
-                return (int) hex_digit - 'a' + 10;
+    private static int digit(char ch) {
+        int r = Character.digit(ch, 16);
+        if (r < 0) {
+            throw new NumberFormatException("Invalid hexadecimal string: " + ch);
         }
-        throw new Exception("bad ");
-    }
-
-    public static String base16Decode(String input) {
-        int len = input.length();
-        if (len % 2 == 1) {
-            return "";
-        }
-
-        String output = "";
-        for (int i = 0; i < input.length(); ) {
-            try {
-                i++;
-                int hi = hexValue((char) i);
-                i++;
-                int lo = hexValue((char) i);
-                int j = hi << 4 | lo;
-                output = output + j;
-            } catch (Exception ex) {
-            }
-        }
-        return output;
-    }
-    public static String bin2hex(byte[] data) {
-        StringBuilder hex = new StringBuilder(data.length * 2);
-        for (byte b : data)
-            hex.append(String.format("%02x", b & 0xFF));
-        return hex.toString();
-    }
-    public static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
-        }
-        return data;
+        return r;
     }
 
 
