@@ -2,8 +2,8 @@ package com.mediaparkPK.bip39mnemonic;
 
 import android.content.Context;
 
-import java.io.IOException;
-import java.io.InputStream;
+import com.mediaparkPK.bip39mnemonic.exceptions.WordListException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class WordList {
     private int count;
     private String[] wordsliststr;
 
-    public WordList(String language, Context context) {
+    public WordList(String language, Context context) throws WordListException {
         this.language = language.trim();
         this.words = new ArrayList<>(12);
         this.count = 0;
@@ -33,28 +33,28 @@ public class WordList {
             }
         }
         if (this.count != 2048) {
-
+            throw new WordListException("BIP39 words list file must have precise 2048 entries");
         }
 
     }
-    public static WordList English() {
+    public static WordList English() throws WordListException {
         return getLanguage("english");
     }
 
-    public static WordList Spanish() {
+    public static WordList Spanish() throws WordListException {
         return getLanguage("spanish");
     }
 
-    public static WordList Italian() {
+    public static WordList Italian() throws WordListException {
         return getLanguage("italian");
     }
 
-    public static WordList French() {
+    public static WordList French() throws WordListException {
         return getLanguage("french");
     }
 
 
-    public static WordList getLanguage(String language) {
+    public static WordList getLanguage(String language) throws WordListException {
         if (instances == null) {
             instances = new HashMap<>();
         }
