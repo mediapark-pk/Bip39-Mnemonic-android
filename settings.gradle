@@ -1,2 +1,3 @@
 rootProject.name='Bip39 Mnemonic java'
 include ':app'
+include ':bip39android'
