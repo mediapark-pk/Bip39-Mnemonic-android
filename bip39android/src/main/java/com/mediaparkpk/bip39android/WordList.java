@@ -1,19 +1,28 @@
-package com.mediaparkPK.bip39mnemonic;
+package com.mediaparkpk.bip39android;
 
 import android.content.Context;
 
-import com.mediaparkPK.bip39mnemonic.exceptions.WordListException;
+import com.mediaparkpk.bip39android.exceptions.WordListException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.mediaparkPK.bip39mnemonic.utils.WordListUtils.getFileContent;
+import static com.mediaparkpk.bip39android.utils.WordListUtils.getFileContent;
 
 public class WordList {
 
     private static Map<String, WordList> instances;
     private String language;
+
+    public static Context getContext() {
+        return context;
+    }
+
+    public static void setContext(Context context) {
+        WordList.context = context;
+    }
+
     private static Context context;
     private ArrayList<String> words;
     private int count;
@@ -37,6 +46,7 @@ public class WordList {
         }
 
     }
+
     public static WordList English() throws WordListException {
         return getLanguage("english");
     }

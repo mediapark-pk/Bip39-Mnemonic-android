@@ -1,9 +1,10 @@
-package com.mediaparkPK.bip39mnemonic;
+package com.mediaparkpk.bip39android;
 
 import android.text.TextUtils;
-import android.util.Log;
 
-import com.mediaparkPK.bip39mnemonic.utils.SecureRandomStrengthener;
+import com.mediaparkpk.bip39android.exceptions.MnemonicException;
+import com.mediaparkpk.bip39android.exceptions.WordListException;
+import com.mediaparkpk.bip39android.secureRandomStrengthener.SecureRandomStrengthener;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -11,32 +12,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.mediaparkPK.bip39mnemonic.utils.Bip39Utils.base_convert;
-import static com.mediaparkPK.bip39mnemonic.utils.Bip39Utils.bytesToHex;
-import static com.mediaparkPK.bip39mnemonic.utils.Bip39Utils.hash;
-import static com.mediaparkPK.bip39mnemonic.utils.Bip39Utils.hash2bin;
-import static com.mediaparkPK.bip39mnemonic.utils.Bip39Utils.str_pad;
-import static com.mediaparkPK.bip39mnemonic.utils.Bip39Utils.str_split;
+import static com.mediaparkpk.bip39android.utils.Bip39Utils.base_convert;
+import static com.mediaparkpk.bip39android.utils.Bip39Utils.bytesToHex;
+import static com.mediaparkpk.bip39android.utils.Bip39Utils.hash;
+import static com.mediaparkpk.bip39android.utils.Bip39Utils.hex2bin;
+import static com.mediaparkpk.bip39android.utils.Bip39Utils.str_pad;
+import static com.mediaparkpk.bip39android.utils.Bip39Utils.str_split;
 
 public class Bip39 {
     private final String TAG = "Bip39";
     public final String version = "0.1.2";
-    private static int wordsCount;
-    private static int overallBits;
-    private static int checksumBits;
-    private static int entropyBits;
-    private static String entropy;
-    private static String checksum;
-    private static ArrayList<String> rawBinaryChunks;
-    private static ArrayList<String> words;
-    public static WordList wordList;
-    private static ArrayList<Integer> entropyBitsValidator = new ArrayList<>(Arrays.asList(128, 160, 192, 224, 256));
+    private int wordsCount;
+    private int overallBits;
+    private int checksumBits;
+    private int entropyBits;
+    private String entropy;
+    private String checksum;
+    private ArrayList<String> rawBinaryChunks;
+    private ArrayList<String> words;
+    public WordList wordList;
 
-    public Bip39(int wordCount) {
+    public Bip39(int wordCount) throws MnemonicException {
         if (wordCount < 12 || wordCount > 24) {
-            Log.d(TAG, " Mnemonic words count must be between 12-24");
+            throw new MnemonicException("Mnemonic words count must be between 12-24");
         } else if (wordCount % 3 != 0) {
-            Log.d(TAG, " Words count must be generated in multiples of 3");
+            throw new MnemonicException("Words count must be generated in multiples of 3");
         }
         // Actual words count
         this.wordsCount = wordCount;
@@ -48,18 +48,18 @@ public class Bip39 {
         this.entropyBits = this.overallBits - this.checksumBits;
     }
 
-    public static Mnemonic Entropy(String entropy) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static Mnemonic Entropy(String entropy) throws UnsupportedEncodingException, NoSuchAlgorithmException, MnemonicException, WordListException {
         validateEntropy(entropy);
-        entropyBits = entropy.length() * 4;
-        checksumBits = ((entropyBits - 128) / 32) + 4;
-        wordsCount = (entropyBits + checksumBits) / 11;
+        int entropyBits = entropy.length() * 4;
+        int checksumBits = ((entropyBits - 128) / 32) + 4;
+        int wordsCount = (entropyBits + checksumBits) / 11;
         return (new Bip39(wordsCount))
                 .useEntropy(entropy)
                 .wordList(WordList.English())
                 .mnemonic();
     }
 
-    public static Mnemonic Generate(int wordCount) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static Mnemonic Generate(int wordCount) throws UnsupportedEncodingException, NoSuchAlgorithmException, MnemonicException, WordListException {
         return (new Bip39(wordCount))
                 .generateSecureEntropy()
                 .wordList(WordList.English())
@@ -68,10 +68,11 @@ public class Bip39 {
 
     /**
      * Todo Add the Wordlist and Bool VerifyChecksum in it
+     *
      * @param words
      * @return
      */
-    public static Mnemonic Words(String words) {
+    public static Mnemonic Words(String words) throws MnemonicException, WordListException {
 
         String[] wordslist = words.split(" ");
         int wordCount = wordslist.length;
@@ -80,7 +81,7 @@ public class Bip39 {
                 .reverse(Arrays.asList(wordslist));
     }
 
-    public Bip39 useEntropy(String entropy) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public Bip39 useEntropy(String entropy) throws UnsupportedEncodingException, NoSuchAlgorithmException, MnemonicException {
         validateEntropy(entropy);
         this.entropy = entropy;
         this.checksum = this.checksum(entropy, this.checksumBits);
@@ -88,7 +89,7 @@ public class Bip39 {
         return this;
     }
 
-    public Bip39 generateSecureEntropy() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public Bip39 generateSecureEntropy() throws UnsupportedEncodingException, NoSuchAlgorithmException, MnemonicException {
         this.useEntropy(bytesToHex(SecureRandomStrengthener.getInstance().generateAndSeedRandomNumberGenerator().generateSeed(this.entropyBits / 8)));
         return this;
     }
@@ -128,7 +129,6 @@ public class Bip39 {
 
         String rawBinary = TextUtils.join("", mnemonic.rawBinaryChunks);
         String strentropyBits = rawBinary.substring(0, this.entropyBits);
-        //String strchecksumBits = rawBinary.substring(this.entropyBits, this.checksumBits);
 
         mnemonic.entropy = this.bits2hex(strentropyBits);
         return mnemonic;
@@ -145,16 +145,16 @@ public class Bip39 {
 
     private String bits2hex(String bits) {
         String hex = "";
-        for (String chunk : str_split(bits,4)) {
+        for (String chunk : str_split(bits, 4)) {
             hex = hex + base_convert(chunk, 2, 16);
         }
         return hex;
     }
 
     private String checksum(String entropy, int bits) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        String  str = hash("SHA-256", hash2bin(entropy), true);
-        str=str.substring(0,2);
-        int checksumChar= (char)Integer.parseInt(str, 16);
+        String str = hash("SHA-256", hex2bin(entropy), true);
+        str = str.substring(0, 2);
+        int checksumChar = (char) Integer.parseInt(str, 16);
         checksum = "";
         for (int i = 0; i < bits; i++) {
             int j = checksumChar >> (7 - i) & 1;
@@ -163,9 +163,14 @@ public class Bip39 {
         return checksum;
     }
 
-    private static void validateEntropy(String entropy) {
+    private static void validateEntropy(String entropy) throws MnemonicException {
+        if (entropy.matches("/^[a-f0-9]{2,}$/")) {
+            throw new MnemonicException("Invalid entropy (requires hexadecimal)");
+        }
+        ArrayList<Integer> entropyBitsValidator = new ArrayList<>(Arrays.asList(128, 160, 192, 224, 256));
         int entropyBits = entropy.length() * 4;
-        if (entropyBitsValidator.contains(entropyBits)) {
+        if (!entropyBitsValidator.contains(entropyBits)) {
+            throw new MnemonicException("Invalid entropy length");
         }
     }
 

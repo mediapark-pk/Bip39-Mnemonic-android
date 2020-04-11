@@ -1,4 +1,4 @@
-package com.mediaparkPK.bip39mnemonic.exceptions;
+package com.mediaparkpk.bip39android.exceptions;
 
 public class WordListException extends Exception {
 

@@ -1,4 +1,4 @@
-package com.mediaparkPK.bip39mnemonic;
+package com.mediaparkpk.bip39android;
 
 import android.text.TextUtils;
 
@@ -6,8 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 
-import static com.mediaparkPK.bip39mnemonic.utils.Bip39Utils.bytesToHex;
-import static com.mediaparkPK.bip39mnemonic.utils.MnemonicUtils.pbkdf2;
+import static com.mediaparkpk.bip39android.utils.Bip39Utils.bytesToHex;
+import static com.mediaparkpk.bip39android.utils.MnemonicUtils.pbkdf2;
 
 public class Mnemonic {
 

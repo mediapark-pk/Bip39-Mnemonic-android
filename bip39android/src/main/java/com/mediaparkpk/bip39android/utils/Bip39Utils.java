@@ -1,4 +1,4 @@
-package com.mediaparkPK.bip39mnemonic.utils;
+package com.mediaparkpk.bip39android.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

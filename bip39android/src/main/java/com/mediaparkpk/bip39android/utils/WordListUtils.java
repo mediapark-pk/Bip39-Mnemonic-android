@@ -1,8 +1,8 @@
-package com.mediaparkPK.bip39mnemonic.utils;
+package com.mediaparkpk.bip39android.utils;
 
 import android.content.Context;
 
-import com.mediaparkPK.bip39mnemonic.exceptions.WordListException;
+import com.mediaparkpk.bip39android.exceptions.WordListException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +10,7 @@ import java.io.InputStream;
 public class WordListUtils {
     public static String getFileContent(String language, Context context) throws WordListException {
         try {
-            InputStream inputStreamReader = context.getAssets().open(language + ".txt");
+            InputStream inputStreamReader = context.getResources().openRawResource(context.getResources().getIdentifier(language, "raw",context.getPackageName()));
             int size = inputStreamReader.available();
             byte[] buffer = new byte[size];
             inputStreamReader.read(buffer);

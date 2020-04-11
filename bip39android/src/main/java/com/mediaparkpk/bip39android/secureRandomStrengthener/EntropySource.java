@@ -1,4 +1,4 @@
-package com.mediaparkPK.bip39mnemonic.secureRandomStrengthener;
+package com.mediaparkpk.bip39android.secureRandomStrengthener;
 
 import java.nio.ByteBuffer;
 
