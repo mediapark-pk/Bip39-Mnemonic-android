@@ -73,6 +73,11 @@ Usage
         }
 
 ```
+* **Test Vectors File is Placed in Code**
+[Test Vectors](https://github.com/mediapark-pk/Bip39-Mnemonic-android/blob/master/app/src/main/assets/TestVector.json)
+
+
+
 * **0.1**
     * Initial release
 
