@@ -32,6 +32,11 @@ dependencies {
 
 Usage
 -----
+**Pass Context to WordList File Before Using The BIP39 Methods**
+```
+   WordList.setContext(this);
+```
+
 **Entropy To Words Generation.**
 
 **Seed Generation with Passphrase "TREZOR" and 512 bytes.**
