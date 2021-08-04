@@ -72,7 +72,7 @@ public class Bip39 {
      * @param words
      * @return
      */
-    public static Mnemonic Words(String words) throws MnemonicException, WordListException {
+    public static Mnemonic Words(String words) throws MnemonicException, WordListException, UnsupportedEncodingException, NoSuchAlgorithmException {
 
         String[] wordslist = words.split(" ");
         int wordCount = wordslist.length;
@@ -112,9 +112,7 @@ public class Bip39 {
         return this;
     }
 
-    public Mnemonic reverse(List<String> words) {
-
-
+    public Mnemonic reverse(List<String> words) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         Mnemonic mnemonic = new Mnemonic();
         int pos = 0;
         for (String word : words) {
@@ -129,8 +127,9 @@ public class Bip39 {
 
         String rawBinary = TextUtils.join("", mnemonic.rawBinaryChunks);
         String strentropyBits = rawBinary.substring(0, this.entropyBits);
-
+        String checksum=rawBinary.substring(this.entropyBits,rawBinary.length());
         mnemonic.entropy = this.bits2hex(strentropyBits);
+        checksum(mnemonic.entropy,this.checksumBits);
         return mnemonic;
     }
 
