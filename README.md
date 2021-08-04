@@ -14,7 +14,7 @@ Gradle
 ------
 **Step 1**. Add the JitPack repository to your build file
 
-```
+```gradle
 allprojects {
 	repositories {
 		...
@@ -23,7 +23,7 @@ allprojects {
 }
 ```
 **Step 2**. Add the dependency
-```
+```gradle
 dependencies {
     ...
     implementation 'com.github.mediapark-pk:Bip39-Mnemonic-android:0.1'
